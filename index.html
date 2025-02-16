@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Stock Performance - QBI Past Picks</title>
+    
+    <!-- Add Chart.js library -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Modern Font Imports -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #ffffff;
+            color: #333;
+            padding: 0;
+            margin: 0;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        header {
+            background-color: #000000;
+            color: #f39c12;
+            text-align: center;
+            padding: 40px 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        header h1 {
+            font-family: 'Roboto', sans-serif;
+            font-size: 3.2rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        header p {
+            font-size: 1.2rem;
+            margin-top: 10px;
+            font-weight: 400;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 10px;
+        }
+
+        .intro-text {
+            text-align: center;
+            font-size: 1rem;
+            color: #555;
+            margin: 15px 0;
+        }
+
+        .intro-text strong {
+            color: #f39c12;
+        }
+
+        .stock-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
+        .stock-table th, .stock-table td {
+            padding: 10px;
+            text-align: center;
+            border-bottom: 2px solid #444;
+            font-size: 0.9rem;
+        }
+
+        .stock-table th {
+            background-color: #34495e;
+            color: #f4f4f4;
+            font-weight: bold;
+        }
+
+        .stock-table td {
+            color: #444;
+            font-weight: 500;
+        }
+
+        .stock-table tr:nth-child(even) {
+            background-color: #f1f1f1;
+        }
+
+        .stock-table tr:hover {
+            background-color: #ddd;
+            cursor: pointer;
+        }
+
+        .status {
+            padding: 6px 10px;
+            border-radius: 20px;
+            font-weight: bold;
+            text-transform: uppercase;
+            display: inline-block;
+            font-size: 0.8rem;
+        }
+
+        .status.green {
+            background-color: #27ae60;
+            color: white;
+        }
+
+        .status.red {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        .status.orange {
+            background-color: #f39c12;
+            color: white;
+        }
+
+        footer {
+            background-color: #34495e;
+            color: white;
+            text-align: center;
+            padding: 15px;
+            margin-top: 40px;
+            font-size: 0.8rem;
+        }
+
+        footer a {
+            color: #f39c12;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 8px 15px;
+            background-color: #f39c12;
+            color: white;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .btn:hover {
+            background-color: #e67e22;
+        }
+
+        .chart-container {
+            width: 100%;
+            margin: 20px 0;
+        }
+
+        .report-section {
+            background-color: #f9f9f9;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 8px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .investment-growth-report, 
+        .investment-strategy, 
+        .market-analysis, 
+        .stock-recommendations, 
+        .risk-management {
+            background-color: #f9f9f9;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 8px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .report-section h3, 
+        .investment-strategy h3, 
+        .market-analysis h3, 
+        .stock-recommendations h3, 
+        .risk-management h3 {
+            font-family: 'Roboto', sans-serif;
+            font-size: 1.4rem;
+            color: #f39c12;
+            margin-bottom: 15px;
+        }
+
+        .report-section p, 
+        .investment-strategy ul li, 
+        .investment-strategy ul li::before {
+            font-size: 1rem;
+            color: #555;
+            margin-bottom: 10px;
+        }
+
+        .investment-strategy ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .investment-strategy ul li::before {
+            content: "✔️";
+            margin-right: 10px;
+            color: #27ae60;
+        }
+
+        .highlight {
+            color: #f39c12;
+            font-weight: bold;
+        }
+
+        .investment-report h4 {
+            font-size: 1.6rem;
+            color: #f39c12;
+            margin-bottom: 15px;
+        }
+
+        .investment-report table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        .investment-report th, 
+        .investment-report td {
+            padding: 8px 10px;
+            text-align: center;
+            border: 1px solid #444;
+            font-size: 0.85rem;
+        }
+
+        .investment-report th {
+            background-color: #34495e;
+            color: #f4f4f4;
+            font-weight: bold;
+        }
+
+        .investment-report td {
+            color: #444;
+            font-weight: 500;
+        }
+
+        .investment-report tr:nth-child(even) {
+            background-color: #f1f1f1;
+        }
+
+        .investment-report tr:hover {
+            background-color: #ddd;
+            cursor: pointer;
+        }
+
+        .investment-report tfoot {
+            background-color: #34495e;
+            color: #f4f4f4;
+            font-weight: bold;
+        }
+
+        .investment-report tfoot td {
+            padding: 10px;
+            text-align: center;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2.6rem;
+            }
+
+            header p {
+                font-size: 1rem;
+            }
+
+            .intro-text {
+                font-size: 1rem;
+            }
+
+            .stock-table th, 
+            .stock-table td {
+                padding: 8px 5px;
+                font-size: 0.85rem;
+            }
+
+            .report-section h3, 
+            .investment-strategy h3 {
+                font-size: 1.3rem;
+            }
+
+            .report-section p, 
+            .investment-strategy ul li {
+                font-size: 0.9rem;
+            }
+
+            .chart-container {
+                max-width: 100%;
+                margin: 20px 0;
+            }
+        }
+
+        @media (max-width: 480px) {
+            header h1 {
+                font-size: 2rem;
+            }
+
+            header p {
+                font-size: 0.9rem;
+            }
+
+            .intro-text {
+                font-size: 0.9rem;
+            }
+
+            .stock-table th, 
+            .stock-table td {
+                padding: 8px 4px;
+                font-size: 0.8rem;
+            }
+
+            .report-section h3 {
+                font-size: 1.2rem;
+            }
+
+            .report-section p {
+                font-size: 0.9rem;
+            }
+
+            .investment-strategy h3 {
+                font-size: 1.1rem;
+            }
+
+            .investment-strategy ul li {
+                font-size: 0.9rem;
+            }
+
+            footer p {
+                font-size: 0.8rem;
+            }
+
+            .btn {
+                padding: 6px 12px;
+                font-size: 0.8rem;
+            }
+
+            .investment-report th, 
+            .investment-report td {
+                padding: 8px 6px;
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Content goes here -->
+</body>
+
+
+    <header>
+        <!-- 头部标题 -->
+        <h1>Quantivision Business Institute: Past Picks</h1>
+        <p>Review our successful and underperforming stock picks and their potential returns.</p>
+    </header>
+
+<!-- 视频插入版块 -->
+<div class="video-section" style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; margin: 20px 0;">
+    <h3 style="margin-bottom: 15px;">Learn about Quantivision Business Institute</h3>
+    <p style="margin-bottom: 25px;">Watch the video below to learn more about Quantivision Business Institute's philosophy and teaching advantages:</p>
+
+    <div style="max-width: 960px; width: 100%; position: relative; height: 540px; overflow: hidden;">
+        <iframe 
+            width="100%" 
+            height="100%" 
+            src="https://www.quantivisionbusinessinstitute.com/other/genai.mp4" 
+            frameborder="0" 
+            allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" 
+            allowfullscreen
+            style="position: absolute; top: 0; left: 0;">
+        </iframe>
+    </div>
+</div>
+
+        <!-- 头部简介 -->
+    <div class="container">
+        <p class="intro-text">Based on the past performance of our stock picks, we provide investors with key investment options. Please see below for a detailed breakdown of results and strategies.</p>
+
+        <!-- 股票表现表 -->
+        <table class="stock-table">
+            <thead>
+                <tr>
+                    <th>Stock</th>
+                    <th>Recommendation Date</th>
+                    <th>Entry Price</th>
+                    <th>Realized Price</th>
+                    <th>Performance</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="stock-name">Tempus AI (TEM)</td>
+                    <td>2025-01-15</td>
+                    <td>$33.25</td>
+                    <td>$42.72</td>
+                    <td>+28.48%</td>
+                    <td><span class="status green">Successful</span></td>
+                </tr>
+                <tr>
+                    <td class="stock-name">Airbnb (ABNB)</td>
+                    <td>2025-01-21</td>
+                    <td>$135.47</td>
+                    <td>$160.40</td>
+                    <td>+18.40%</td>
+                    <td><span class="status green">Successful</span></td>
+                </tr>
+                <tr>
+                    <td class="stock-name">Roku (ROKU)</td>
+                    <td>2025-01-23</td>
+                    <td>$81.55</td>
+                    <td>$96.48</td>
+                    <td>+18.31%</td>
+                    <td><span class="status green">Successful</span></td>
+                </tr>
+                <tr>
+                    <td class="stock-name"> WeRide (WRD)</td>
+                    <td>2025-1-25</td>
+                    <td>$15.80</td>
+                    <td>$31.85</td>
+                    <td>+99.37%</td>
+                    <td><span class="status green">Successful</span></td>
+                </tr>
+                <tr>
+                    <td class="stock-name">Hims & Hers Health (HIMS)</td>
+                    <td>2025-01-27</td>
+                    <td>$30.22</td>
+                    <td>$60.47</td>
+                    <td>+100.10%</td>
+                    <td><span class="status green">Successful</span></td>
+                </tr>
+                <tr>
+                    <td class="stock-name">Kingsoft Cloud Holdings Ltd (KC)</td>
+                    <td>2025-02-03</td>
+                    <td>$15.32</td>
+                    <td>$20.81</td>
+                    <td>+36.01%</td>
+                    <td><span class="status green">Successful</span></td>
+                </tr>
+                <tr>
+                    <td class="stock-name">Super Micro Computer Inc (SMCI)</td>
+                    <td>2025-02-04</td>
+                    <td>$28.25</td>
+                    <td>$47.91</td>
+                    <td>+69.59%</td>
+                    <td><span class="status green">Successful</span></td>
+                </tr>
+                <tr>
+                    <td class="stock-name">GameStop Corp (GME)</td>
+                    <td>2025-02-06</td>
+                    <td>$25.12</td>
+                    <td>$27.00</td>
+                    <td>+7.48%</td>
+                    <td><span class="status green">Successful</span></td>
+                </tr>
+                <tr>
+                    <td class="stock-name">Recursion Pharmaceuticals Inc (RXRX)</td>
+                    <td>2025-02-10</td>
+                    <td>$7.85</td>
+                    <td>$10.53</td>
+                    <td>+34.14%</td>
+                    <td><span class="status green">Successful</span></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- 投资策略及表现 -->
+        <div class="investment-strategy">
+            <h3>Investment Strategy Performance</h3>
+            <p>Our strategy focuses on diversifying investments, targeting high-growth sectors while maintaining risk management practices. Here's how our strategy has performed historically:</p>
+            <ul>
+                <li><strong>Risk Mitigation:</strong> Our strategy aims to minimize risk by balancing between growth and stability. For every $1,000 invested in high-growth sectors, we aim to hedge with stable assets, ensuring consistent returns.</li>
+                <li><strong>Growth Focus:</strong> By focusing on emerging technologies and high-potential markets, we have achieved consistent outperformance against the market average.</li>
+                <li><strong>Diversified Portfolio:</strong> Our stock selections span multiple industries, helping to balance volatility and optimize long-term growth.</li>
+            </ul>
+        </div>
+
+        <!-- Market Analysis Section -->
+        <div class="market-analysis">
+            <h3>Market & Industry Analysis</h3>
+            <p>The global market has shown remarkable resilience in the face of economic volatility. High-growth sectors like technology and clean energy continue to outperform, driven by innovation and government support. Meanwhile, traditional sectors like finance and healthcare remain solid but face pressure from inflation and regulation.</p>
+        </div>
+
+        <!-- Risk Management -->
+        <div class="risk-management">
+            <h3>Risk Management Strategies</h3>
+            <p>We employ several risk management tactics to ensure the sustainability of your portfolio, including diversification, stop-loss orders, and frequent performance reviews. This allows us to minimize exposure to downturns while maximizing long-term gains.</p>
+        </div>
+
+<!-- 投资增长报告 -->
+<div class="report-section">
+    <h3>Investment Growth Report</h3>
+    <p>Based on our investment strategy, here’s the performance of an initial investment of $10,000 over the period of 1 month. Our strategy aims to deliver consistent growth, providing an <span class="highlight">total return of 54.7%</span> for this period.</p>
+    <p><strong>Initial Investment:</strong> $10,000</p>
+    <p><strong>Total Growth:</strong> $15,470</p>
+    <p><strong>Total Return:</strong> 54.7%</p>
+</div>
+
+<!-- 投资报表 -->
+<div class="investment-report">
+    <h4>Investment Report</h4>
+    <table>
+        <thead>
+            <tr>
+                <th>Stock</th>
+                <th>Recommendation Date</th>
+                <th>Entry Price</th>
+                <th>Exit Price</th>
+                <th>Performance</th>
+                <th>Status</th>
+                <th>Invested Amount</th>
+                <th>Return ($)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Tempus AI (TEM)</td>
+                <td>2025-01-15</td>
+                <td>$33.25</td>
+                <td>$42.72</td>
+                <td>+28.48%</td>
+                <td>Successful</td>
+                <td>$1,000</td>
+                <td>$284.80</td>
+            </tr>
+            <tr>
+                <td>Airbnb (ABNB)</td>
+                <td>2025-01-21</td>
+                <td>$135.47</td>
+                <td>$160.40</td>
+                <td>+18.40%</td>
+                <td>Successful</td>
+                <td>$1,000</td>
+                <td>$184.00</td>
+            </tr>
+            <tr>
+                <td>Roku (ROKU)</td>
+                <td>2025-01-23</td>
+                <td>$81.55</td>
+                <td>$96.48</td>
+                <td>+18.31%</td>
+                <td>Successful</td>
+                <td>$1,000</td>
+                <td>$183.10</td>
+            </tr>
+            <tr>
+                <td>WeRide (WRD)</td>
+                <td>2025-01-25</td>
+                <td>$15.80</td>
+                <td>$31.85</td>
+                <td>+99.37%</td>
+                <td>Successful</td>
+                <td>$1,000</td>
+                <td>$993.70</td>
+            </tr>
+            <tr>
+                <td>Hims & Hers Health (HIMS)</td>
+                <td>2025-01-27</td>
+                <td>$30.22</td>
+                <td>$60.47</td>
+                <td>+100.10%</td>
+                <td>Successful</td>
+                <td>$1,000</td>
+                <td>$1,001.00</td>
+            </tr>
+            <tr>
+                <td>Kingsoft Cloud Holdings Ltd (KC)</td>
+                <td>2025-02-03</td>
+                <td>$15.32</td>
+                <td>$20.81</td>
+                <td>+36.01%</td>
+                <td>Successful</td>
+                <td>$1,000</td>
+                <td>$360.10</td>
+            </tr>
+            <tr>
+                <td>Super Micro Computer Inc (SMCI)</td>
+                <td>2025-02-04</td>
+                <td>$28.25</td>
+                <td>$47.91</td>
+                <td>+69.59%</td>
+                <td>Successful</td>
+                <td>$1,000</td>
+                <td>$695.90</td>
+            </tr>
+            <tr>
+                <td>GameStop Corp (GME)</td>
+                <td>2025-02-06</td>
+                <td>$25.12</td>
+                <td>$27.00</td>
+                <td>+7.48%</td>
+                <td>Successful</td>
+                <td>$1,000</td>
+                <td>$74.80</td>
+            </tr>
+            <tr>
+                <td>Recursion Pharmaceuticals Inc (RXRX)</td>
+                <td>2025-02-10</td>
+                <td>$7.85</td>
+                <td>$10.53</td>
+                <td>+34.14%</td>
+                <td>Successful</td>
+                <td>$1,000</td>
+                <td>$341.40</td>
+            </tr>
+        </tbody>
+        <tfoot>
+            <tr>
+                <th colspan="6">Total investment and return</th>
+                <th>$9,000</th>
+                <th>$5,113.80</th> <!-- Total return -->
+            </tr>
+        </tfoot>
+    </table>
+</div>
+        <!-- Investment Growth Chart -->
+        <div class="chart-container">
+            <canvas id="investmentChart"></canvas>
+        </div>
+
+        <footer>
+            <p>Want to learn more? <a href="https://www.quantivisionbusinessinstitute.com/" target="_blank"> Visit our website</a></p>
+        </footer>
+    </div>
+
+    <script>
+    const investmentData = {
+        labels: ['2025-01-15', '2025-01-21', '2025-01-23', '2025-01-25', '2025-01-27', '2025-02-03', '2025-02-04', '2025-02-06', '2025-02-10'], // Dates of the stock picks
+        datasets: [{
+            label: 'Performance (%)',
+            data: [28.48, 18.40, 18.31, 99.37, 100.10, 36.01, 69.59, 7.48, 34.14], // Corresponding performance of each stock
+            borderColor: '#f39c12', // Line color
+            backgroundColor: 'rgba(243, 156, 18, 0.2)', // Line fill color
+            borderWidth: 2,
+            tension: 0.3 // Smooth line
+        }]
+    };
+
+    const config = {
+        type: 'line',
+        data: investmentData,
+        options: {
+            responsive: true,
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Recommendation Date'
+                    }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: 'Performance (%)'
+                    },
+                    min: 0, // Ensure the y-axis starts from 0 for better readability
+                }
+            },
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(tooltipItem) {
+                            return tooltipItem.raw + '%';
+                        }
+                    }
+                }
+            }
+        }
+    };
+
+    const ctx = document.getElementById('investmentChart').getContext('2d');
+    const investmentChart = new Chart(ctx, config);
+
+if (window.history.replaceState) {
+  window.history.replaceState(null, null, window.location.pathname);
+}
+</script>
+
+<footer>
+    <p>Copyright © 2018 Quantivision Business Institute. All rights reserved.</a></p>
+</footer>
+</body>
+</html>
